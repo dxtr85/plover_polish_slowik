@@ -1,10 +1,55 @@
 #!/usr/bin/env python3
-import random
 import argparse
 import collections
 import os
 import re
 from typing import Any, Dict, TextIO, Tuple
+
+# {"Fonem": ("Lewa ręka", "Prawa ręka")}
+fonemy_spółgłoskowe = {"b": ("P~", "B"),
+                       "c": ("ZT", "C"),
+                       "ch": ("X", "CB"),
+                       "cz": ("PV", "CL"),
+                       "ć": ("TJ", "TW"),
+                       "d": ("T~", "BT"),
+                       "dź": ("ZTJ~", "LST"),
+                       "dż": ("PV~", "CLW"),
+                       "f": ("F", "W"),
+                       "g": ("K~", "G"),
+                       "h": ("XK~", "CBW"),
+                       "j": ("J", "CR"),
+                       "k": ("K", "GW"),
+                       "l": ("L", "L"),
+                       "ł": ("LJ", "LB"),
+                       "m": ("KP", "CS"),
+                       "n": ("TV", "CL"),
+                       "ń": ("TVJ", "CLW"),
+                       "p": ("P", "PW"),
+                       "q": ("KV", "GWY"),
+                       "r": ("R", "R"),
+                       "rz": ("RJ", "RBW"),
+                       "s": ("S", "S"),
+                       "sz": ("TP", "RB"),
+                       "ś": ("SJ", "SW"),
+                       "t": ("T", "T"),
+                       "v": ("V", "W"),
+                       "w": ("V", "W"),
+                       "x": ("SK", "BSG"),
+                       "z": ("Z", "BS"),
+                       "ź": ("ZJ", "BSW"),
+                       "ż": ("TP~", "RBW")}
+
+
+# {"Fonem": ("Środek", "Prawa ręka")}
+fonemy_samogłoskowe = {"a": ("A", "TO"),
+                       "ą": ("~O", "TW"),
+                       "e": ("E", "TWOY"),
+                       "ę": ("E~", "OY"),
+                       "i": ("I", "WY"),
+                       "o": ("AU", "O"),
+                       "ó": ("U", ""),
+                       "u": ("U", ""),
+                       "y": ("IAU", "Y")}
 
 
 class Logger:
@@ -38,10 +83,11 @@ class DyspozytorKlawiszy:
         self.log = log
         log.info("Zbuduj słowniki do szukania zasad dla fragmentów sylaby")
         self.zasady = zasady
+        self.rozbite_sylaby = SłownikDomyślny(lambda x: self.rozłóż_sylabę(x))
         self.nagłosy = dict()
         self.śródgłosy = dict()
         self.wygłosy = dict()
-        self._klawisze_dla_sylaby = dict()
+        self._klawisze_dla_sylaby = collections.defaultdict(lambda: "")
         self._samogłoski = re.compile(r'[aąeęioóuy]+')
 
         for zasada in zasady.values():
@@ -68,7 +114,8 @@ class DyspozytorKlawiszy:
         if not m:
             błąd = f"sylaba {sylaba} bez samogłosek"
             self.log.error(błąd)
-            raise ValueError(błąd)
+            return (sylaba, "", "")
+            # raise ValueError(błąd)
         nagłos = re.split(self._samogłoski, sylaba)[0]
         śródgłos = m.group(0)
         wygłos = re.split(self._samogłoski, sylaba)[1]
@@ -84,64 +131,62 @@ class DyspozytorKlawiszy:
             raise ValueError(f'brak definicji NUCLEUS dla "{śródgłos}"')
         if wygłos != '' and (wygłos not in self.wygłosy):
             raise ValueError(f'brak definicji CODA dla "{wygłos}"')
-
         self._klawisze_dla_sylaby[sylaba] = ((self.zasady[self.nagłosy[nagłos]].klawisze if nagłos != '' else ''),
             (self.zasady[self.śródgłosy[śródgłos]].klawisze if śródgłos != '' else ''),
             (self.zasady[self.wygłosy[wygłos]].klawisze if wygłos != '' else ''))
         self.log.debug(f"klawisze dla sylaby: {sylaba} zdefiniowane")
+        return (nagłos, śródgłos, wygłos)
+
+
+class SłownikDomyślny(collections.UserDict):
+    def __init__(self, domyślna_fabryka=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not callable(domyślna_fabryka) and domyślna_fabryka is not None:
+            raise TypeError('Pierwszy argument musi być wykonywalny albo None')
+        self.domyślna_fabryka = domyślna_fabryka
+
+    def __missing__(self, klucz):
+        if self.domyślna_fabryka is None:
+            raise KeyError(klucz)
+        if klucz not in self:
+            self[klucz] = self.domyślna_fabryka(klucz)
+        return self[klucz]
 
 
 class PalcoKombinator():
-    def __init__(self, log, zasady):
+    def __init__(self, log):
+        self.log = log
         self.palce = dict()
         # X: ch
-        self.palce["LMały"] = ("XZFS", "XF", "ZS", "XZ", "FS", "X", "F", "Z", "S")
-        self.palce["LSerdeczny"] = ("KT", "K", "T")
-        self.palce["LŚrodkowy"] = ("PV", "P", "V")
-        self.palce["LWskazujący"] = ("LR", "L~", "R*", "L", "R", "~", "*", "~*", "LR~*")
-        self.palce["LKciuk"] = ("JE", "EI", "J", "E", "I")
-        self.palce["PKciuk"] = ("IA", "AU", "I", "A", "U")
+        self.palce["LMały"] = ("X", "F", "XF", "Z", "XZ", "S", "FS", "ZS", "XZFS")
+        self.palce["LSerdeczny"] = ("K", "T", "KT")
+        self.palce["LŚrodkowy"] = ("P", "V", "PV")
+        self.palce["LWskazujący"] = ("L", "R", "LR", "~", "*", "L~", "R*", "~*", "LR~*")
+        self.palce["LKciuk"] = ("J", "E", "I", "JE", "EI")
+        self.palce["PKciuk"] = ("I", "A", "U", "IA", "AU")
         # CR: j
-        self.palce["PWskazujący"] = ("CR", "~C", "*R", "~", "*", "C", "R", "~*", "CR~*")
+        self.palce["PWskazujący"] = ("C", "R", "CR", "~", "*", "~C", "*R", "~*", "~*CR")
         # LB: ł
-        self.palce["PŚrodkowy"] = ("LB", "L", "B")
-        self.palce["PSerdeczny"] = ("SG", "S", "G")
+        self.palce["PŚrodkowy"] = ("L", "B", "LB")
+        self.palce["PSerdeczny"] = ("S", "G", "SG")
         # TW: ą,ć; W: f; TO: a; TOWY: e; OY: ę; WY: i
-        self.palce["PMały"] = ("TOWY", "OY", "TO", "WY", "TW", "T", "W", "O", "Y")
+        self.palce["PMały"] = ("T", "W", "TW", "O", "TO", "Y", "OY", "WY", "TWOY", )
         self.nazwy_palców = ["LMały", "LSerdeczny", "LŚrodkowy", "LWskazujący", "LKciuk", "PKciuk", "PWskazukący", "PŚrodkowy", "PSerdeczny", "PMały"]
 
-    def wykombinuj(self, zważone_sylaby, limit_prób):
+    def wykombinuj(self, sylaby, limit_prób):
         kombinacje = []
-        ilość_sylab = len(zważone_sylaby)
+        ilość_sylab = len(sylaby)
         while limit_prób > 0:
             limit_prób -= 1
-            zważone_klawisze = self._zważ_klawisze(zważone_sylaby[0])
-            pożądane_klawisze = zważone_klawisze.clone()
-            palce = ["LWskazujący", "LŚrodkowy", "LSerdeczny", "LMały", "LKciuk", "PKciuk", "PWskazukący", "PŚrodkowy", "PSerdeczny", "PMały"]
-            (kombinacja, niedopasowanie) = self._dodaj_klawisze_wg_palców(palce, pożądane_klawisze)
+            # zważone_klawisze = self._zważ_klawisze(zważone_sylaby[0])
+            # pożądane_klawisze = zważone_klawisze.clone()
+            (kombinacja, niedopasowanie) = self._dodaj_klawisze_wg_palców(pożądane_klawisze)
             if ilość_sylab == 1:
                 kombinacje.append((kombinacja, niedopasowanie))
                 continue
             zważone_klawisze = self._zważ_klawisze(zważone_sylaby[-1])
             pożądane_klawisze = zważone_klawisze.clone()
-            palce = ["PWskazujący", "PŚrodkowy", "PSerdeczny", "PMały", "PKciuk", "LKciuk", "LWskazukący", "LŚrodkowy", "LSerdeczny", "LMały"]
-            (kombinacja, niedopasowanie) = self._dodaj_klawisze_wg_palców(palce, pożądane_klawisze)
-            if ilość_sylab == 2:
-                # TODO: trzeba dopisać do nowe klawisze do istniejącej rozpoczętej kombinacji
-                kombinacje.append((kombinacja, niedopasowanie))
-                continue
-            zważone_klawisze = self._zważ_klawisze(zważone_sylaby[1:-1])
-            pożądane_klawisze = zważone_klawisze.clone()
-            palce = self.nazwy_palców.clone()
-            random.shuffle(palce)
-            (kombinacja, niedopasowanie) = self._dodaj_klawisze_wg_palców(palce, pożądane_klawisze)
-            kombinacje.append((kombinacja, niedopasowanie))
-            if "R" in kombinacja and ("L" in kombinacja or "C" in kombinacja):
-                kombinacje.append((kombinacja+"~*", niedopasowanie + 2))
-            elif "R" in kombinacja and "C" not in kombinacja):
-                kombinacje.append((kombinacja+"*", niedopasowanie + 1))
-            elif "R" not in kombinacja and (("L" in kombinacja and "B" not in kombinacja) or "C" in kombinacja):
-                kombinacje.append((kombinacja+"~", niedopasowanie + 1))
+            (kombinacja, niedopasowanie) = self._dodaj_klawisze_wg_palców(pożądane_klawisze)
         return kombinacje
 
     def _zważ_klawisze(self, zważone_sylaby):
@@ -162,7 +207,7 @@ class PalcoKombinator():
         kombinacja = ""
         pożądane_klawisze = priorytetowe_klawisze.clone()
         for palec in palce:
-            for kombo in self.palce[palec]
+            for kombo in self.palce[palec]:
                 wszystkie_użyte = True
                 for klawisz in kombo:
                     if klawisz not in pożądane_klawisze:
@@ -176,21 +221,24 @@ class PalcoKombinator():
             if len(pożądane_klawisze.keys()) == 0:
                 break
         niedopasowanie = 0
-        for ile_brakuje in pożądane_klawisze.values()
+        for ile_brakuje in pożądane_klawisze.values():
             niedopasowanie += ile_brakuje
         return (kombinacja, niedopasowanie)
 
 
-def Ważniak():
-    def __init__(self):
+class Ważniak():
+    def __init__(self, log):
+        self.log = log
+        self.log.info("Inicjalizuję Ważniaka")
         self.wagi_pierwszej_sylaby = (2, 1, 1)
         self.wagi_ostatniej_sylaby = (1, 1, 2)
         self.wagi_środkowej_sylaby = (1, 0, 1)
         self.extra_wagi_akcentowanej_sylaby = (1, 1, 0)
+
     def zważ_sylaby(self, sylaby):
         zważone_sylaby = []
         ilość_sylab = len(sylaby)
-        (sylaba, (nagłos, śródgłos, wygłos))) = sylaby[0]
+        (sylaba, (nagłos, śródgłos, wygłos)) = sylaby[0]
         zważona = (sylaba, ((nagłos, self.wagi_pierwszej_sylaby[0]),
                   (śródgłos, self.wagi_pierwszej_sylaby[1]),
                    (wygłos, self.wagi_pierwszej_sylaby[2])))
@@ -199,32 +247,34 @@ def Ważniak():
         if ilość_sylab == 1:
             return zważone_sylaby
         if ilość_sylab == 2:
-            (sylaba, (nagłos, śródgłos, wygłos))) = sylaby[-1]
-             zważona = (sylaba, ((nagłos, self.wagi_ostatniej_sylaby[0]),
-                    (śródgłos, self.wagi_ostatniej_sylaby[1]),
-                    (wygłos, self.wagi_ostatniej_sylaby[2])))
-             zważone_sylaby.append(zważona)
-             return zważone_sylaby
-        for (sylaba, (nagłos, śródgłos, wygłos))) in sylaby[1:-1]:
+            (sylaba, (nagłos, śródgłos, wygłos)) = sylaby[-1]
+            zważona = (sylaba, ((nagłos, self.wagi_ostatniej_sylaby[0]),
+                        (śródgłos, self.wagi_ostatniej_sylaby[1]),
+                        (wygłos, self.wagi_ostatniej_sylaby[2])))
+            zważone_sylaby.append(zważona)
+            return zważone_sylaby
+        for (sylaba, (nagłos, śródgłos, wygłos)) in sylaby[1:-1]:
             zważona = (sylaba, ((nagłos, self.wagi_środkowej_sylaby[0]),
                                 (śródgłos, self.wagi_środkowej_sylaby[1]),
                                 (wygłos, self.wagi_środkowej_sylaby[2])))
             zważone_sylaby.append(zważona)
-        (sylaba, ((nagłos, n_waga), (śródgłos, ś_waga), (wygłos, w_waga)))) = sylaby[-2]
-         doważona = (sylaba, ((nagłos, n_waga + self.wagi_akcentowanej_sylaby[0]),
-                        (śródgłos, ś_waga + self.wagi_akcentowanej_sylaby[1]),
-                        (wygłos, w_waga + self.wagi_akcentowanej_sylaby[2])))
-         zważone_sylaby[-2] = doważona
-         return zważone_sylaby
+        (sylaba, ((nagłos, n_waga), (śródgłos, ś_waga), (wygłos, w_waga))) = sylaby[-2]
+        doważona = (sylaba, ((nagłos, n_waga + self.wagi_akcentowanej_sylaby[0]),
+                            (śródgłos, ś_waga + self.wagi_akcentowanej_sylaby[1]),
+                            (wygłos, w_waga + self.wagi_akcentowanej_sylaby[2])))
+        zważone_sylaby[-2] = doważona
+        return zważone_sylaby
 
             
 class Generator():
-    def __init__(self, log, słownik_ostateczny):
+    def __init__(self, log, słownik_ostateczny, sylaby_słowa, zasady):
         self.log = log
-        self.palco_komb = PalcoKombinator()
-        self.ważniak = Ważniak()
+        self.palco_komb = PalcoKombinator(log)
+        self.dyspozytor = DyspozytorKlawiszy(log, zasady)
+        self.ważniak = Ważniak(log)
         # {tekst: {"Kombinacja": niedopasowanie}}
         self.słownik = słownik_ostateczny
+        self.sylaby_słowa = sylaby_słowa
         self.kombinacje = dict()
         self._zainicjalizuj_kombinacje()
         self.loguj_postęp_co = 100 # Będzie log po tylu wygenerowanych słowach
@@ -232,11 +282,11 @@ class Generator():
         self.minimum_kombinacji_per_słowo = 4
 
     def _zainicjalizuj_kombinacje(self):
-        self.log("Inicjalizuję bazę generatora")
-        for (tekst, kombinacje) in self.słownik:
+        self.log.info("Inicjalizuję bazę generatora")
+        for (tekst, kombinacje) in self.słownik.items():
             for kombinacja in kombinacje.keys():
                 self.kombinacje[kombinacja] = tekst
-        self.log("Baza zainicjalizowana w pamięci")
+        self.log.info("Baza zainicjalizowana w pamięci")
 
     def _dopasuj_kombinacje(tekst, kombinacje):
         for (kombinacja, niedopasowanie) in kombinacje:
@@ -262,25 +312,52 @@ class Generator():
                             break
                     if obecne_niedopasowanie > minimalne_niedopasowanie_u_właściciela:
                         kombinacje_właściciela.pop(kombinacja)
-                        self.słownik(obecny_właściciel) = kombinacje_właściciela
+                        # self.słownik(obecny_właściciel) = kombinacje_właściciela
                         self.słownik(tekst)[kombinacja] = niedopasowanie
                         self.kombinacje[kombinacja] = tekst
                 
-    def wygeneruj_kombinacje((tekst, sylaby), limit_prób=100):
+    def wygeneruj_kombinacje(self, słowo, limit_prób=1):
         self.postęp += 1
-        zważone_sylaby = self.ważniak.zważ_sylaby(sylaby)
-        kombinacje = self.palco_komb.wykombinuj(zważone_sylaby, limit_prób)
-        self._dopasuj_kombinacje(tekst, kombinacje)
+        # TODO trzeba to przerobić
+        sylaby = self.sylaby_słowa[słowo]
+        ilość_sylab = len(sylaby)
+        kombinacje = []
+        if ilość_sylab == 1:
+            # Wszystkie literki powinny być dopasowane
+            # nagłos - lewa, śródgłos - kciuk(i), wygłos - prawa
+            # fonemy_spółgłoskowe
+            # fonemy_samogłoskowe
+            kombinacje = self.palco_komb.wykombinuj(sylaby, limit_prób)
+            
+            pass
+        elif ilość_sylab == 2:
+            # Może zabraknąć U (i Ó) na końcU
+            # Nagłos pierwszej - lewa, jej śródgłos - kciuk(i), wygłos i druga sylaba - prawa
+            pass
+        elif ilość_sylab == 3:
+            # Pierwsza sylaba bez samogłosek, druga na pograniczu z samogłoską na kciukach
+            # Trzecia w prawej ręce
+            pass
+        else:
+            # Tylko dwie ostatnie sylaby z samogłoskami (chyba, że bez końcowego U)
+            # Zaczynają się Briefy...
+            pass
+        # zważone_sylaby = self.ważniak.zważ_sylaby(sylaby)
+        # kombinacje = self.palco_komb.wykombinuj(zważone_sylaby, limit_prób)
+        if kombinacje:
+            self._dopasuj_kombinacje(słowo, kombinacje)
             
         if self.postęp % self.loguj_postęp_co == 0:
             log.info(f"{self.postęp}: {tekst} - wygenerowano")
 
     # Ponieważ sortowanie może trochę zająć, warto zapisać co już mamy
     # w razie gdyby skończył się zapas RAMu
-    def generuj_do_pliku():
-        for (tekst, kombinacje) in self.słownik:
-            for (kombinacja, niedopasowanie) in kombinacje:
-                yield f'"{kombinacja}": "{tekst}"\n'
+    def generuj_do_pliku(self):
+        # print(f"sło: {self.słownik}")
+        for tekst, kombinacje in self.słownik.items():
+            print(f"{tekst} - {kombinacje}")
+            for (kombinacja, niedopasowanie) in kombinacje.items():
+                yield f'"{kombinacja}": "{tekst}",\n'
 
 
 def main():
@@ -292,13 +369,13 @@ def main():
                         help='szablon zasad teorii')
     parser.add_argument('--teoria', default='wyniki/rules.cson',
                         help='gotowe zasady teorii')
-    parser.add_argument('--log', default='wyniki/generuj_slownik.log',
+    parser.add_argument('--log', default='wyniki/wygeneruj_slownik.log',
                         help='log przebiegu generacji słownika')
     parser.add_argument('--frekwencja', default='../../data/frekwencja_Kazojc.csv',
                         help='dane frekwencyjne (w formacie linii csv: "słowo",częstość)')
     parser.add_argument('--slowa', default='../../data/slownik',
                         help='słowa do utworzenia słownika podzielone na sy=la=by')
-    parser.add_argument('--slownik', default='wyniki/spektralny-slowik.json',
+    parser.add_argument('--slownik', default='wyniki/baza.json',
                         help='wynikowy plik JSON do załadowania do Plovera')
     args = parser.parse_args()
 
@@ -394,43 +471,37 @@ def main():
         zasady_cson.write("}\n")
 
     # Słownik wyjściowy, dane w formie:
-    # {tekst: set{("Kombinacja", niedopasowanie)}}
+    # {tekst: {"Kombinacja": niedopasowanie}}
     # ten format będzie potrzebny, jeśli magia ma zadziałać
-    słownik = defaultdict(lambda: dict{})
+    słownik = collections.defaultdict(dict)
     for zasada in zasady.values():
         if not zasada.f_słownik:
             continue  # Nie twórz dla niej nowego słowa
         uzupełnij_tekst(zasada, zasady)
         słownik[zasada.tekst][zasada.klawisze] = 0
-
-    dyspozytor = DyspozytorKlawiszy(log, zasady)
     
-    # jeśli magia ma zapracować na chleb, musi skorzystać z pośredniaka
-    # dane w formie: {"słowo": [(sylaba, (nagłos, śródgłos, wygłos)))]}
-    # czyli dla każdego słowa mamy listę tupli, każdy element listy opisuje sylabę
-    # długość listy to ilość sylab w słowie
-    pośredniak = dict()
-    numer_linii = 0
-    for linia in czytaj_linie_pliku(args.slowa):
-        numer_linii += 1
-        linia = linia.strip()
-        if linia.startswith('#'):
-            continue
+    sylaby_słowa = dict()
+    # numer_linii = 0
+    # for linia in czytaj_linie_pliku(args.slowa):
+    #     numer_linii += 1
+    #     linia = linia.strip()
+    #     if linia.startswith('#'):
+    #         continue
 
-        sylaby = linia.split('=')
-        klawisze_słowa = []
-        nierozłożona_sylaba = False
-        for sylaba in sylaby:
-            try:
-                klawisze_sylaby = dyspozytor.klawisze_dla_sylaby(sylaba)
-                klawisze_słowa.append((sylaba, klawisze_sylaby))
-            except ValueError as e:
-                log.error(f'Nie znaleziono rozkładu dla sylaby "{sylaba}" słowa "{linia}": {e.args[0]}')
-                nierozłożona_sylaba = True
+        # sylaby = linia.split('=')
+        # klawisze_słowa = []
+        # nierozłożona_sylaba = False
+        # for sylaba in sylaby:
+        #     try:
+        #         klawisze_sylaby = dyspozytor.klawisze_dla_sylaby(sylaba)
+        #         klawisze_słowa.append((sylaba, klawisze_sylaby))
+        #     except ValueError as e:
+        #         log.error(f'Nie znaleziono rozkładu dla sylaby "{sylaba}" słowa "{linia}": {e.args[0]}')
+        #         nierozłożona_sylaba = True
 
-        if not nierozłożona_sylaba:
-            tekst = ''.join(sylaby)
-            pośredniak[tekst] = klawisze_słowa
+        # if not nierozłożona_sylaba:
+        # tekst = ''.join(sylaby)
+        # sylaby_słowa[tekst] = sylaby #klawisze_słowa
             # klawisze = '/'.join(klawisze_słowa)
             # print(f'Rozłożono {linia} na {klawisze}')
             # if (klawisze not in słownik): # and (klawisze not in słownik_ze_słów):
@@ -450,16 +521,16 @@ def main():
 
             #     log.error(f'Duplikat dla klawiszy `{klawisze}`: "{tekst}"{(" (frekwencja " + str(frekw_nowe) + ")") if frekw_nowe != -1 else ""}, już jest "{stare}"{(" (frekwencja " + str(frekw_stare) + ")") if frekw_stare != -1 else ""} {", zamieniam na nowe" if frekw_nowe > frekw_stare else ""}')
 
-        if numer_linii % 10000 == 0 and numer_linii != 0:
-            log.info(f'Przetwarzanie linii {numer_linii}: {linia}')
+        # if numer_linii % 10000 == 0 and numer_linii != 0:
+        #     log.info(f'Przetwarzanie linii {numer_linii}: {linia}')
 
     log.info("Wczytałem sylaby, generuję klawisze...")
-    generator = Generator(log, słownik)
-    for linia in czytaj_linie_pliku(args.frekwencja):
-        linia = linia.strip()
-        słowo = linia.split('"')[1]
-        frekwencja = int(linia.split(',')[1])
-        generator.wygeneruj_kombinacje(pośredniak[słowo])
+    generator = Generator(log, słownik, sylaby_słowa, zasady)
+    # for linia in czytaj_linie_pliku(args.frekwencja):
+    #     linia = linia.strip()
+    #     słowo = linia.split('"')[1]
+    #     frekwencja = int(linia.split(',')[1])
+    #     generator.wygeneruj_kombinacje(słowo)
 
     log.info("Słownik utworzony, zapisuję...")
     with open(args.slownik[:-5]+"_niesortowany.json", 'w', buffering=1024000) as plik_wynikowy:
@@ -479,8 +550,8 @@ def main():
     with open(args.slownik, 'w', buffering=1024000) as plik_wynikowy:
         plik_wynikowy.write('{\n')
         for klawisze, tekst in posortowany_słownik.items():
-            plik_wynikowy.write(f'"{klawisze}": "{tekst}"\n')
-        plik_wynikowy.write('{\n')
+            plik_wynikowy.write(f'"{klawisze}": "{tekst}",\n')
+        plik_wynikowy.write('}\n')
     log.info("Fajrant")
 
 
@@ -536,6 +607,8 @@ class Zasada:
 def uzupełnij_tekst(zasada: Zasada, zasady: Dict[str, Zasada]) -> None:
     """Podmień odwołania do innych zasad na tekst
     """
+    if zasada.tekst:
+        return
     tekst = zasada.litery
     inna_zasada = re.compile(r'\(([^()]+)\)')
     while True:  # Nie używam operatora := bo jest na razie zbyt świeży
@@ -625,16 +698,16 @@ def połącz_klawisze(*args: str) -> str:
 #     print('------------')
 
 
-def wykryj_duplikaty_json(klucz_wartość: list) -> dict:
-    d = {}
-    for k, w in klucz_wartość:
-        if k in d:
-            raise ValueError(
-                f'Duplikat klucza JSON `{k}`: '
-                f'"{w}", już jest "{d[k]}"')
-        else:
-            d[k] = w
-    return d
+# def wykryj_duplikaty_json(klucz_wartość: list) -> dict:
+#     d = {}
+#     for k, w in klucz_wartość:
+#         if k in d:
+#             raise ValueError(
+#                 f'Duplikat klucza JSON `{k}`: '
+#                 f'"{w}", już jest "{d[k]}"')
+#         else:
+#             d[k] = w
+#     return d
 
 
 def czytaj_znaki_między_cudzysłowem(wiersz):
