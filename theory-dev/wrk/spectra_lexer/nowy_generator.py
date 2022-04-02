@@ -466,18 +466,13 @@ class Generator():
 
 
     def _dopasuj_kombinacje(self, tekst, kombinacje):
-        if tekst == "moc":
-            self.log.info(f"Propozycje dla {tekst}: {kombinacje}({len(kombinacje)}")
         kombinacje_dodane = []
         for kombinacja in kombinacje:
+            niedopasowanie = kombinacja[1]
             obecny_właściciel = None
-            if tekst == "moc":
-                self.log.info(f"sprawdzam: {kombinacja[0][0]}")
 
-            if kombinacja[0] not in self.kombinacje.keys():
+            if kombinacja[0][0] not in self.kombinacje.keys():
                 self.kombinacje[kombinacja[0][0]] = tekst
-                if tekst == "moc":
-                    self.log.info(f"co w kombo {kombinacja[0][0]}: {self.kombinacje[kombinacja[0][0]]}")
 
                 kombinacje_dodane.append(kombinacja)
             else:
@@ -491,8 +486,9 @@ class Generator():
                     continue
                 else:
                     obecne_niedopasowanie = kombinacje_właściciela[kombinacja[0][0]]
-                    if tekst == "moc":
-                        self.log.info(f"2: {kombinacja[0][0]} - niedo: {obecne_niedopasowanie}")
+                    #  Nie zabieramy kombinacji jeśli ich dopasowanie jest takie samo
+                    if obecne_niedopasowanie <= niedopasowanie:
+                        continue
 
                     minimalne_niedopasowanie_u_właściciela = obecne_niedopasowanie
                     for obca_kominacja, obce_niedopasowanie in kombinacje_właściciela.items():
@@ -506,8 +502,8 @@ class Generator():
                     if obecne_niedopasowanie > minimalne_niedopasowanie_u_właściciela:
                         kombinacje_właściciela.pop(kombinacja[0][0])
                         self.słownik(tekst)[kombinacja[0][0]] = niedopasowanie
-                        if tekst == "moc":
-                            self.log.info(f"3: {kombinacja[0][0]} = {tekst}")
+                        # if tekst == "moc":
+                        #     self.log.info(f"3: {kombinacja[0][0]} = {tekst}")
 
                         self.kombinacje[kombinacja[0][0]] = tekst
                         kombinacje_dodane.append(kombinacja)
@@ -654,8 +650,8 @@ class Generator():
         # (dodanie_X_możliwe) == ((z_lewej, czy wszystkie znaki), (z_prawej, czy_wszystkie_znaki))
 
         if kombinacje:
-            if słowo == "moc":
-                    self.log.info(f"dopasowuje moc... {kombinacje}")
+            # if słowo == "moc":
+            #         self.log.info(f"dopasowuje moc... {kombinacje}")
             dodane = self._dopasuj_kombinacje(słowo, kombinacje)
         else:
             self.log.debug(f"Nie znalazłem kombinacji dla: {słowo}")
@@ -717,8 +713,8 @@ class Generator():
     # w razie gdyby skończył się zapas RAMu
     def generuj_do_pliku(self):
         for (kombinacja, tekst) in self.kombinacje.items():
-            if tekst == "moc":
-                self.log.info(f"generuje: {kombinacja}: {tekst}")
+            # if tekst == "moc":
+            #     self.log.info(f"generuje: {kombinacja}: {tekst}")
 
             yield f'"{kombinacja}": "{tekst}",\n'
 
@@ -792,7 +788,7 @@ def main():
         if słowo in istniejące_słowa or słowo.isnumeric():
             continue
 
-        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=20)
+        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=5)
         if not udało_się:
             niepowodzenia.append((słowo, frekwencja))
         numer_generacji += 1
