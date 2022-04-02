@@ -8,6 +8,13 @@ import re
 samogłoski = ['a', 'ą', 'e', 'ę', 'i', 'o', 'ó', 'u', 'y']
 tylda = "~"
 gwiazdka = "*"
+myślnik = "-"
+jot = "J"
+ee = "E"
+ii = "I"
+aa = "A"
+uu = "U"
+nic = ""
 tyldogwiazdka = "~*"
 # {"Fonem": ("Lewa ręka", "Prawa ręka")}
 fonemy_spółgłoskowe = {"b": ("P~", "B"),
@@ -81,9 +88,9 @@ fonemy_samogłoskowe = {"a": ("A", "TO"),
                        "ą": ("~O", "TW"),
                        "e": ("E", "TWOY"),
                        "ę": ("E~", "OY"),
-                       "i": ("I", ""),
+                       "i": ("I", nic),
                        "o": ("AU", "O"),
-                       "ó": ("U", ""),
+                       "ó": ("U", nic),
                        # Tutaj zabrałem prawą rękę z "i"
                        "u": ("U", "WY"),
                        "y": ("IAU", "Y")}
@@ -218,8 +225,7 @@ prawe_indeksy_klawiszy = {"~": 5, "*": 5,
                           "O": 10, "Y": 10, "OY": 10}
 
 
-znaki_środka = ["J", "E","~", "*", "-", "I", "A", "U"]
-
+znaki_środka = ["J", "E",tylda, gwiazdka, "I", "A", "U"]
 
 def klawisze_dla_fonemu(fonem, prawe=False):
     fonem = fonem[0]
@@ -229,7 +235,7 @@ def klawisze_dla_fonemu(fonem, prawe=False):
         return fonemy_spółgłoskowe[fonem][1]           
     else:
         if fonem in samogłoski:
-            return ""
+            return nic
         return fonemy_spółgłoskowe[fonem][0]
 
 
@@ -239,7 +245,7 @@ def niemalejące(fonemy_lewe, fonemy_prawe, bez_inwersji=False):
     if bez_inwersji:
         inwersja_użyta = True
     indeksy = lewe_indeksy_klawiszy
-    indeksy_fonemów_lewe = [(0, 0, "")]  # (indeks_klawisza, indeks_pomocniczy, (fonem, waga))
+    indeksy_fonemów_lewe = [(0, 0, nic)]  # (indeks_klawisza, indeks_pomocniczy, (fonem, waga))
     j = 0
     for i in range(len(fonemy_lewe)):
         fonem = fonemy_lewe[i]
@@ -267,7 +273,7 @@ def niemalejące(fonemy_lewe, fonemy_prawe, bez_inwersji=False):
         else:
             return (False, 0, gdzie_nie_jest)
 
-    indeksy_fonemów_prawe = [(5, 0, "")]
+    indeksy_fonemów_prawe = [(5, 0, nic)]
     # print(f"sprawdzam: {fonemy_lewe}||{fonemy_prawe}")
     indeksy = prawe_indeksy_klawiszy
     j = 0
@@ -379,7 +385,7 @@ class Generator():
         if not m:
             błąd = f"sylaba {sylaba} bez samogłosek"
             self.log.debug(błąd)
-            return (sylaba, "", "")
+            return (sylaba, nic, nic)
         śródgłos = fonemy(m.group(0))
 
         # Wykryj "i" które tylko zmiękcza, przesuń je do nagłosu
@@ -460,14 +466,19 @@ class Generator():
 
 
     def _dopasuj_kombinacje(self, tekst, kombinacje):
-
-        # self.log.debug(f"Propozycje dla {tekst}: {kombinacje}")
+        if tekst == "moc":
+            self.log.info(f"Propozycje dla {tekst}: {kombinacje}({len(kombinacje)}")
         kombinacje_dodane = []
-        # print(f"kombo1234: {kombinacje[0]}")
         for kombinacja in kombinacje:
             obecny_właściciel = None
-            if kombinacja[0][0] not in self.kombinacje.keys():
+            if tekst == "moc":
+                self.log.info(f"sprawdzam: {kombinacja[0][0]}")
+
+            if kombinacja[0] not in self.kombinacje.keys():
                 self.kombinacje[kombinacja[0][0]] = tekst
+                if tekst == "moc":
+                    self.log.info(f"co w kombo {kombinacja[0][0]}: {self.kombinacje[kombinacja[0][0]]}")
+
                 kombinacje_dodane.append(kombinacja)
             else:
                 obecny_właściciel = self.kombinacje[kombinacja[0][0]]
@@ -480,6 +491,9 @@ class Generator():
                     continue
                 else:
                     obecne_niedopasowanie = kombinacje_właściciela[kombinacja[0][0]]
+                    if tekst == "moc":
+                        self.log.info(f"2: {kombinacja[0][0]} - niedo: {obecne_niedopasowanie}")
+
                     minimalne_niedopasowanie_u_właściciela = obecne_niedopasowanie
                     for obca_kominacja, obce_niedopasowanie in kombinacje_właściciela.items():
                         if obce_niedopasowanie < minimalne_niedopasowanie_u_właściciela:
@@ -492,6 +506,9 @@ class Generator():
                     if obecne_niedopasowanie > minimalne_niedopasowanie_u_właściciela:
                         kombinacje_właściciela.pop(kombinacja[0][0])
                         self.słownik(tekst)[kombinacja[0][0]] = niedopasowanie
+                        if tekst == "moc":
+                            self.log.info(f"3: {kombinacja[0][0]} = {tekst}")
+
                         self.kombinacje[kombinacja[0][0]] = tekst
                         kombinacje_dodane.append(kombinacja)
         return kombinacje_dodane
@@ -527,7 +544,7 @@ class Generator():
             indeks_odjemników = -1
             odjemniki_sylab = []
             odejmuj = False
-            bez_śródgłosu = False
+            bez_środka = False
 
             while limit_prób > 0 and pozostały_kombinacje_do_przetestowania:
                 # Wszystkie literki powinny być dopasowane
@@ -539,14 +556,16 @@ class Generator():
                  fonemy_prawe) = self.rozbij_sylaby_na_fonemy(sylaby_lewe,
                                                             sylaba_środkowa,
                                                             sylaby_prawe)
-                # self.log.info(f"1:{fonemy_lewe} | {śródgłos} | {fonemy_prawe}")
+                # self.log.info(f"{fonemy_lewe} | {śródgłos} | {fonemy_prawe}")
                 waga_słowa = 0
                 for fonem in fonemy_lewe + śródgłos + fonemy_prawe:
                     waga_słowa += fonem[1]
+                if bez_środka:
+                    śródgłos = nic
                 ręka_lewa = RękaLewa(self.log)
                 ręka_prawa = RękaPrawa(self.log)
 
-                kombinacja_środkowa = ""
+                kombinacja_środkowa = nic
                 if not (malejące_lewe or malejące_prawe or bez_inwersji):
                     fonemy_niemalejące = False
                     while not fonemy_niemalejące:
@@ -556,6 +575,9 @@ class Generator():
                         (fonemy_niemalejące, który, gdzie) = niemalejące(fonemy_lewe,
                                                                          fonemy_prawe,
                                                                          bez_inwersji)
+                        #  Zbieramy informacje o fonemach, które być może
+                        #  trzeba będzie wyciszyć aby uzyskać unikalną
+                        #  kombinację
                         if not fonemy_niemalejące:
                             if który == 0:
                                 malejące_lewe.append(gdzie[2])
@@ -600,7 +622,7 @@ class Generator():
                 # self.log.debug(f"{słowo} {waga_słowa}, Lewa:{ręka_lewa.waga()} Prawa: {ręka_prawa.waga()}")
                 niedopasowanie = waga_słowa + wzrost_niedopasowania\
                   - ręka_lewa.waga() - ręka_prawa.waga()
-                self.log.debug(f"{słowo} NPo: {niedopasowanie}")
+                # self.log.debug(f"{słowo} NPo: {niedopasowanie}")
                 # kompletny_akord: ("ZN~*AKI",
                 #   ( (dodanie_tyldy_z_lewej, czy_wszystkie_klawisze),
                 #     (dodanie_tyldy_z_prawej, czy_wszystkie_klawisze) ),
@@ -613,12 +635,16 @@ class Generator():
                                                          ręka_prawa.akord_prawy())
                 kombinacje.append((kompletny_akord, niedopasowanie))
                 limit_prób -= 1
-                bez_inwersji = False
                 if bez_inwersji:
+                    bez_środka = True
+                if bez_środka:
+                    bez_inwersji = False
+                    bez_środka = False
                     odejmuj = True
                 if odejmuj:
                     indeks_odjemników += 1
                     if indeks_odjemników >= len(odjemniki_sylab):
+                        odejmuj = False
                         pozostały_kombinacje_do_przetestowania = False
 
         dodane = []
@@ -628,6 +654,8 @@ class Generator():
         # (dodanie_X_możliwe) == ((z_lewej, czy wszystkie znaki), (z_prawej, czy_wszystkie_znaki))
 
         if kombinacje:
+            if słowo == "moc":
+                    self.log.info(f"dopasowuje moc... {kombinacje}")
             dodane = self._dopasuj_kombinacje(słowo, kombinacje)
         else:
             self.log.debug(f"Nie znalazłem kombinacji dla: {słowo}")
@@ -635,12 +663,16 @@ class Generator():
         if len(dodane) == 0 and kombinacje:
             #  Możemy pokombinować z gwiazdkami
             #  Na razie logika minimalistyczna
+            # if słowo == "moc":
+            #     self.log.info(f"moc: {kombinacje}")
             for kombinacja in kombinacje:
                 nowe_podkombinacje = dodaj_znaki_specjalne_do_kombinacji(kombinacja)
                 nowe_kombinacje += nowe_podkombinacje
                 # if len(dodane) > 0:
                 #     break
             if nowe_kombinacje:
+                if słowo == "moc":
+                    self.log.info(f"dopasowuje moc... {nowe_kombinacje}")
                 dodane += self._dopasuj_kombinacje(słowo, nowe_kombinacje)
 
         if self.postęp % self.loguj_postęp_co == 0:
@@ -655,24 +687,24 @@ class Generator():
         tylda_prawa = tylda in ręka_prawa[0]
         gwiazdka_lewa = gwiazdka in ręka_lewa[0]
         gwiazdka_prawa = gwiazdka in ręka_prawa[0]
-        ptyldogwiazdka = ""
+        ptyldogwiazdka = nic
         ręka_lewa_znaki = ręka_lewa[0]
         ręka_prawa_znaki = ręka_prawa[0]
         if tylda_lewa or tylda_prawa:
-            ręka_lewa_znaki = ręka_lewa_znaki.replace(tylda, "")
-            ręka_prawa_znaki = ręka_prawa_znaki.replace(tylda, "")
-            kombinacja_środkowa = kombinacja_środkowa.replace(tylda, "")
+            ręka_lewa_znaki = ręka_lewa_znaki.replace(tylda, nic)
+            ręka_prawa_znaki = ręka_prawa_znaki.replace(tylda, nic)
+            kombinacja_środkowa = kombinacja_środkowa.replace(tylda, nic)
             ptyldogwiazdka = tylda
 
         if gwiazdka_lewa or gwiazdka_prawa:
-            ręka_lewa_znaki = ręka_lewa_znaki.replace(gwiazdka, "")
-            ręka_prawa_znaki = ręka_prawa_znaki.replace(gwiazdka, "")
-            kombinacja_środkowa = kombinacja_środkowa.replace(gwiazdka, "")
+            ręka_lewa_znaki = ręka_lewa_znaki.replace(gwiazdka, nic)
+            ręka_prawa_znaki = ręka_prawa_znaki.replace(gwiazdka, nic)
+            kombinacja_środkowa = kombinacja_środkowa.replace(gwiazdka, nic)
             ptyldogwiazdka += gwiazdka
-
+        if len(ptyldogwiazdka) == 0:
+            ptyldogwiazdka = "-"
         kombinacja_środkowa += ptyldogwiazdka
-        wynik = ""
-        kombinacja_środkowa += "-"
+        wynik = nic
         for znak in znaki_środka:
             if znak in kombinacja_środkowa:
                 wynik += znak
@@ -685,6 +717,9 @@ class Generator():
     # w razie gdyby skończył się zapas RAMu
     def generuj_do_pliku(self):
         for (kombinacja, tekst) in self.kombinacje.items():
+            if tekst == "moc":
+                self.log.info(f"generuje: {kombinacja}: {tekst}")
+
             yield f'"{kombinacja}": "{tekst}",\n'
 
 
@@ -757,7 +792,7 @@ def main():
         if słowo in istniejące_słowa or słowo.isnumeric():
             continue
 
-        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=2)
+        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=20)
         if not udało_się:
             niepowodzenia.append((słowo, frekwencja))
         numer_generacji += 1
@@ -803,7 +838,7 @@ def main():
 
 def czytaj_znaki_między_cudzysłowem(wiersz):
     lista = []
-    token = ""
+    token = nic
     cudzysłów_otwarty = False
     poprzedni_backslash = False
     for znak in wiersz:
@@ -812,7 +847,7 @@ def czytaj_znaki_między_cudzysłowem(wiersz):
             poprzedni_backslash = False
         elif cudzysłów_otwarty and znak == '"' and not poprzedni_backslash:
             lista.append(token)
-            token = ""
+            token = nic
             cudzysłów_otwarty = False
         elif cudzysłów_otwarty and znak == '"' and poprzedni_backslash:
             token+=znak
@@ -892,8 +927,8 @@ class Kombinacja:
         for klawisz in self.klawisze.values():
             yield klawisz
             
-lewe_wszystkie = "LR~*"
-prawe_wszystkie = "~*CR"
+lewe_wszystkie = "LR~*-"
+prawe_wszystkie = "~*-CR"
 def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
     #   ( (dodanie_tyldy_z_lewej, czy_wszystkie_klawisze),
     #     (dodanie_tyldy_z_prawej, czy_wszystkie_klawisze) ),
@@ -908,65 +943,94 @@ def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
             ((l_gwiazdka, lg_wszystko), (p_gwiazdka, pg_wszystko)),
             ((l_tyldogwiazdka, ltg_wszystko), (p_tyldogwiazdka, ptg_wszystko))) = kombo
     # print(f"kombo: {kombo}")
-    znaki_lewe, znaki_prawe = znaki.split("-")
+    if myślnik in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(myślnik)
+    elif tylda in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(tylda)
+        znaki_prawe = tylda + znaki_prawe
+    elif gwiazdka in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(gwiazdka)
+        znaki_prawe = gwiazdka + znaki_prawe
+    elif jot in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(jot)
+        znaki_lewe = znaki_lewe + jot
+    elif ee in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(ee)
+        znaki_lewe = znaki_lewe + ee
+    elif ii in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(ii)
+        znaki_prawe = ii + znaki_prawe
+    elif aa in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(aa)
+        znaki_prawe = aa + znaki_prawe
+    elif uu in znaki:
+        znaki_lewe, znaki_prawe = znaki.split(uu)
+        znaki_prawe = uu + znaki_prawe
+    else:
+        print(f"ERR: Nie wiem jak podzielić {znaki} w {kombo}")
+        return []
     if l_tylda or p_tylda:
         if lt_wszystko:
             for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, "")
+                znaki_lewe = znaki_lewe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
         elif pt_wszystko:
             for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, "")
+                znaki_prawe = znaki_prawe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
         else:
-            nowe_kombinacje.append(znaki_lewe.replace(tylda, "")\
+            nowe_kombinacje.append(znaki_lewe.replace(tylda, nic)\
                                    + tylda\
-                                   + znaki_prawe.replace(tylda, ""))
+                                   # + myślnik\
+                                   + znaki_prawe.replace(tylda, nic))
 
     if l_gwiazdka or p_gwiazdka:
         if lg_wszystko:
             for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, "")
+                znaki_lewe = znaki_lewe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
         elif pg_wszystko:
             for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, "")
+                znaki_prawe = znaki_prawe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
         else:
-            nowe_kombinacje.append(znaki_lewe.replace(gwiazdka, "")\
+            nowe_kombinacje.append(znaki_lewe.replace(gwiazdka, nic)\
                                    + gwiazdka\
-                                   + znaki_prawe.replace(gwiazdka, ""))
+                                   # + myślnik\
+                                   + znaki_prawe.replace(gwiazdka, nic))
 
     if l_tyldogwiazdka or p_tyldogwiazdka:
         if ltg_wszystko:
             for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, "")
+                znaki_lewe = znaki_lewe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
         elif ptg_wszystko:
             for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, "")
+                znaki_prawe = znaki_prawe.replace(znak, nic)
             nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
         elif l_tyldogwiazdka:
-            nowe_prawe = znaki_prawe.replace(tylda, "")
-            nowe_prawe = nowe_prawe.replace(gwiazdka, "")
+            nowe_prawe = znaki_prawe.replace(tylda, nic)
+            nowe_prawe = nowe_prawe.replace(gwiazdka, nic)
             nowe_kombinacje.append(znaki_lewe\
                                    + tyldogwiazdka\
+                                   # + myślnik\
                                    + nowe_prawe)
         elif p_tyldogwiazdka:
-            nowe_lewe = znaki_lewe.replace(tylda, "")
-            nowe_lewe = nowe_lewe.replace(gwiazdka, "")
+            nowe_lewe = znaki_lewe.replace(tylda, nic)
+            nowe_lewe = nowe_lewe.replace(gwiazdka, nic)
             nowe_kombinacje.append(nowe_lewe\
                                    + tyldogwiazdka\
+                                   # + myślnik\
                                    + znaki_prawe)
     output = []
     for nowa in nowe_kombinacje:
-        output.append(((nowa, ((False, False),
-                              (False, False)),
+        output.append( (
+            (nowa, ((False, False),
+                    (False, False)),
+             ((False, False),
+              (False, False)),
                              ((False, False),
-                              (False, False)),
-                             (False,
-                              (True, False)))
-                              , -3))
+                              (True, False))), niedopasowanie))
     return output
     
 
@@ -1125,7 +1189,7 @@ class Palec:
 
     def tekst(self):
         ile_klawiszy_użytych = len(self.klawisze)
-        tekst = ""
+        tekst = nic
         if ile_klawiszy_użytych == 3:
             # Musimy coś wywalić, pierwszy i ostatni musi zostać
             musi_zostać = self.pierwszy_lub_ostatni_klawisz()
