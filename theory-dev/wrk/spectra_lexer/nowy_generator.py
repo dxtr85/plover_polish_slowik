@@ -650,8 +650,6 @@ class Generator():
         # (dodanie_X_możliwe) == ((z_lewej, czy wszystkie znaki), (z_prawej, czy_wszystkie_znaki))
 
         if kombinacje:
-            # if słowo == "moc":
-            #         self.log.info(f"dopasowuje moc... {kombinacje}")
             dodane = self._dopasuj_kombinacje(słowo, kombinacje)
         else:
             self.log.debug(f"Nie znalazłem kombinacji dla: {słowo}")
@@ -667,8 +665,6 @@ class Generator():
                 # if len(dodane) > 0:
                 #     break
             if nowe_kombinacje:
-                if słowo == "moc":
-                    self.log.info(f"dopasowuje moc... {nowe_kombinacje}")
                 dodane += self._dopasuj_kombinacje(słowo, nowe_kombinacje)
 
         if self.postęp % self.loguj_postęp_co == 0:
@@ -788,7 +784,7 @@ def main():
         if słowo in istniejące_słowa or słowo.isnumeric():
             continue
 
-        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=5)
+        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=10)
         if not udało_się:
             niepowodzenia.append((słowo, frekwencja))
         numer_generacji += 1
@@ -797,7 +793,9 @@ def main():
     # Na czas developmentu wyłączone
     # log.info("Dodaję słowa bez podanej częstotliwości")
     # for słowo in sylaby_słowa.keys():
-    #     generator.wygeneruj_kombinacje(słowo, limit_prób=10)
+    #     udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=10)
+    #     if not udało_się:
+    #         niepowodzenia.append((słowo, frekwencja))
     #     numer_generacji += 1
 
     log.info(f"Nie powiodło się dodawanie kombinacji dla {len(niepowodzenia)} słów.")
