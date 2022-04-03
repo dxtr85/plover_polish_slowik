@@ -473,6 +473,7 @@ class Generator():
 
             if kombinacja[0][0] not in self.kombinacje.keys():
                 self.kombinacje[kombinacja[0][0]] = tekst
+                self.słownik[tekst][kombinacja[0][0]] = niedopasowanie
 
                 kombinacje_dodane.append(kombinacja)
             else:
@@ -487,11 +488,11 @@ class Generator():
                 else:
                     obecne_niedopasowanie = kombinacje_właściciela[kombinacja[0][0]]
                     #  Nie zabieramy kombinacji jeśli ich dopasowanie jest takie samo
-                    if obecne_niedopasowanie <= niedopasowanie:
-                        continue
+                    # if obecne_niedopasowanie <= niedopasowanie:
+                    #     continue
 
                     minimalne_niedopasowanie_u_właściciela = obecne_niedopasowanie
-                    for obca_kominacja, obce_niedopasowanie in kombinacje_właściciela.items():
+                    for obca_kombinacja, obce_niedopasowanie in kombinacje_właściciela.items():
                         if obce_niedopasowanie < minimalne_niedopasowanie_u_właściciela:
                             minimalne_niedopasowanie_u_właściciela = obce_niedopasowanie
                             break
@@ -501,10 +502,7 @@ class Generator():
                             break
                     if obecne_niedopasowanie > minimalne_niedopasowanie_u_właściciela:
                         kombinacje_właściciela.pop(kombinacja[0][0])
-                        self.słownik(tekst)[kombinacja[0][0]] = niedopasowanie
-                        # if tekst == "moc":
-                        #     self.log.info(f"3: {kombinacja[0][0]} = {tekst}")
-
+                        self.słownik[tekst][kombinacja[0][0]] = niedopasowanie
                         self.kombinacje[kombinacja[0][0]] = tekst
                         kombinacje_dodane.append(kombinacja)
         return kombinacje_dodane
@@ -657,8 +655,6 @@ class Generator():
         if len(dodane) == 0 and kombinacje:
             #  Możemy pokombinować z gwiazdkami
             #  Na razie logika minimalistyczna
-            # if słowo == "moc":
-            #     self.log.info(f"moc: {kombinacje}")
             for kombinacja in kombinacje:
                 nowe_podkombinacje = dodaj_znaki_specjalne_do_kombinacji(kombinacja)
                 nowe_kombinacje += nowe_podkombinacje
@@ -784,7 +780,7 @@ def main():
         if słowo in istniejące_słowa or słowo.isnumeric():
             continue
 
-        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=10)
+        udało_się = generator.wygeneruj_kombinacje(słowo, limit_prób=5)
         if not udało_się:
             niepowodzenia.append((słowo, frekwencja))
         numer_generacji += 1
@@ -921,8 +917,8 @@ class Kombinacja:
         for klawisz in self.klawisze.values():
             yield klawisz
             
-lewe_wszystkie = "LR~*-"
-prawe_wszystkie = "~*-CR"
+lewe_wszystkie = "LR~*"
+prawe_wszystkie = "~*CR"
 def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
     #   ( (dodanie_tyldy_z_lewej, czy_wszystkie_klawisze),
     #     (dodanie_tyldy_z_prawej, czy_wszystkie_klawisze) ),
@@ -936,7 +932,8 @@ def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
     (znaki, ((l_tylda, lt_wszystko),(p_tylda, pt_wszystko)),
             ((l_gwiazdka, lg_wszystko), (p_gwiazdka, pg_wszystko)),
             ((l_tyldogwiazdka, ltg_wszystko), (p_tyldogwiazdka, ptg_wszystko))) = kombo
-    # print(f"kombo: {kombo}")
+    tylda_już_jest = tylda in znaki
+    gwiazdka_już_jest = gwiazdka in znaki
     if myślnik in znaki:
         znaki_lewe, znaki_prawe = znaki.split(myślnik)
     elif tylda in znaki:
@@ -963,68 +960,29 @@ def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
     else:
         print(f"ERR: Nie wiem jak podzielić {znaki} w {kombo}")
         return []
-    if l_tylda or p_tylda:
-        if lt_wszystko:
-            for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
-        elif pt_wszystko:
-            for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
-        else:
-            nowe_kombinacje.append(znaki_lewe.replace(tylda, nic)\
-                                   + tylda\
-                                   # + myślnik\
-                                   + znaki_prawe.replace(tylda, nic))
+    znaki_lewe = znaki_lewe.replace(myślnik, nic)
+    znaki_prawe = znaki_prawe.replace(myślnik, nic)
+    gołe_lewe = znaki_lewe.replace(gwiazdka, nic).replace(tylda, nic)
+    gołe_prawe = znaki_prawe.replace(gwiazdka, nic).replace(tylda, nic)
+    istniejąca_tylda = nic
+    if tylda_już_jest:
+        istniejąca_tylda = tylda
+    istniejąca_gwiazdka = nic
+    if gwiazdka_już_jest:
+        istniejąca_gwiazdka = gwiazdka
 
-    if l_gwiazdka or p_gwiazdka:
-        if lg_wszystko:
-            for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
-        elif pg_wszystko:
-            for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
-        else:
-            nowe_kombinacje.append(znaki_lewe.replace(gwiazdka, nic)\
-                                   + gwiazdka\
-                                   # + myślnik\
-                                   + znaki_prawe.replace(gwiazdka, nic))
-
-    if l_tyldogwiazdka or p_tyldogwiazdka:
-        if ltg_wszystko:
-            for znak in lewe_wszystkie:
-                znaki_lewe = znaki_lewe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + lewe_wszystkie + znaki_prawe)
-        elif ptg_wszystko:
-            for znak in prawe_wszystkie:
-                znaki_prawe = znaki_prawe.replace(znak, nic)
-            nowe_kombinacje.append(znaki_lewe + prawe_wszystkie + znaki_prawe)
-        elif l_tyldogwiazdka:
-            nowe_prawe = znaki_prawe.replace(tylda, nic)
-            nowe_prawe = nowe_prawe.replace(gwiazdka, nic)
-            nowe_kombinacje.append(znaki_lewe\
-                                   + tyldogwiazdka\
-                                   # + myślnik\
-                                   + nowe_prawe)
-        elif p_tyldogwiazdka:
-            nowe_lewe = znaki_lewe.replace(tylda, nic)
-            nowe_lewe = nowe_lewe.replace(gwiazdka, nic)
-            nowe_kombinacje.append(nowe_lewe\
-                                   + tyldogwiazdka\
-                                   # + myślnik\
-                                   + znaki_prawe)
+    if not tylda_już_jest:
+        nowe_kombinacje.append(gołe_lewe + tylda + istniejąca_gwiazdka + gołe_prawe)
+    if not gwiazdka_już_jest:
+        nowe_kombinacje.append(gołe_lewe + istniejąca_tylda + gwiazdka + gołe_prawe)
+    if not (tylda_już_jest and gwiazdka_już_jest):
+        nowe_kombinacje.append(gołe_lewe + lewe_wszystkie + gołe_prawe)
     output = []
     for nowa in nowe_kombinacje:
-        output.append( (
-            (nowa, ((False, False),
-                    (False, False)),
-             ((False, False),
-              (False, False)),
-                             ((False, False),
-                              (True, False))), niedopasowanie))
+        output.append( ((nowa, ((l_tylda, lt_wszystko),(p_tylda, pt_wszystko)),
+                               ((l_gwiazdka, lg_wszystko), (p_gwiazdka, pg_wszystko)),
+                               ((l_tyldogwiazdka, ltg_wszystko), (p_tyldogwiazdka, ptg_wszystko))),
+                        niedopasowanie))
     return output
     
 
@@ -1241,7 +1199,7 @@ class Palec:
             # return (True, self.wspierane_kombinacje[-1])
             return (True, True)  # Gwiazdka wspierana, wtedy wszystkie klawisze aktywowane
         elif len(self.klawisze) == 1\
-          and "R" in self.klawisze.keys():
+          and ("R" in self.klawisze.keys() or tylda in self.klawisze.keys()):
             # if self.obsługiwane_klawisze[0] == "L"
             #     return (True, "R*")
             # else:
