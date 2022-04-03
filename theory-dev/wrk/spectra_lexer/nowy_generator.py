@@ -17,63 +17,63 @@ uu = "U"
 nic = ""
 tyldogwiazdka = "~*"
 # {"Fonem": ("Lewa ręka", "Prawa ręka")}
-fonemy_spółgłoskowe = {"b": ("P~", "B"),
-                       "bi": ("PJ~", "BW"),
-                       "c": ("ZT", "C"),
-                       "ci": ("ZTJ", "CW"),
-                       "ch": ("X", "CB"),
-                       "chi": ("XJ", "CBW"),
-                       "cz": ("PV", "CL"),
-                       "czi": ("PVJ", "CLW"),
-                       "ć": ("TJ", "TW"),
-                       "d": ("T~", "BT"),
-                       "di": ("TJ~", "BTW"),
-                       "dz": ("ZT~", "C"),  # Dodałem
-                       "dzi": ("ZTJ~", "CW"),  # Dodałem
-                       "dź": ("ZTJ~", "LST"),
-                       "dż": ("PV~", "CLW"),
-                       "f": ("F", "W"),
-                       "fi": ("FJ", "W"),
-                       "g": ("K~", "G"),
-                       "gi": ("KJ~", "GW"),
-                       "h": ("X~", "CBW"),  # Zamieniłem z XK~
-                       "hi": ("XJ~", "CBW"),  # Zamieniłem z XKJ~
-                       "j": ("J", "CR"),
-                       "ji": ("J", "CRW"),
-                       "k": ("K", "GW"),
-                       "ki": ("KJ", "GW"),
-                       "l": ("L", "L"),
-                       "li": ("LJ", "LW"),
-                       "ł": ("LJ", "LB"),
-                       "łi": ("LJ", "LBW"),
-                       "m": ("KP", "CS"),
-                       "mi": ("KPJ", "CSW"),
-                       "n": ("TV", "CL"),
-                       "ni": ("TVJ", "CLW"),
-                       "ń": ("TVJ", "CLW"),
-                       # Tu zmieniłem prawą, bo nie ma "P" po prawej stronie
-                       "p": ("P", "RG"),
-                       "pi": ("PJ", "RGW"),
-                       "q": ("KV", "GWY"),
-                       "r": ("R", "R"),
-                       "ri": ("RJ", "RW"),
-                       "rz": ("RJ", "RBW"),
-                       "s": ("S", "S"),
-                       "si": ("SJ", "SW"),
-                       "sz": ("TP", "RB"),
-                       "ś": ("SJ", "SW"),
-                       "t": ("T", "T"),
-                       "ti": ("TJ", "TW"),
-                       "v": ("V", "W"),
-                       "vi": ("VJ", "W"),
-                       "w": ("V", "W"),
-                       "wi": ("VJ", "~W"),
-                       "x": ("SK", "BSG"),
-                       "xi": ("SKJ", "BSGW"),
-                       "z": ("Z", "BS"),
-                       "zi": ("ZJ", "BSW"),
-                       "ź": ("ZJ", "BSW"),
-                       "ż": ("TP~", "RBW")}
+# fonemy_spółgłoskowe = {"b": ("P~", "B"),
+#                        "bi": ("PJ~", "BW"),
+#                        "c": ("ZT", "C"),
+#                        "ci": ("ZTJ", "CW"),
+#                        "ch": ("X", "CB"),
+#                        "chi": ("XJ", "CBW"),
+#                        "cz": ("PV", "CL"),
+#                        "czi": ("PVJ", "CLW"),
+#                        "ć": ("TJ", "TW"),
+#                        "d": ("T~", "BT"),
+#                        "di": ("TJ~", "BTW"),
+#                        "dz": ("ZT~", "C"),  # Dodałem
+#                        "dzi": ("ZTJ~", "CW"),  # Dodałem
+#                        "dź": ("ZTJ~", "LST"),
+#                        "dż": ("PV~", "CLW"),
+#                        "f": ("F", "W"),
+#                        "fi": ("FJ", "W"),
+#                        "g": ("K~", "G"),
+#                        "gi": ("KJ~", "GW"),
+#                        "h": ("X~", "CBW"),  # Zamieniłem z XK~
+#                        "hi": ("XJ~", "CBW"),  # Zamieniłem z XKJ~
+#                        "j": ("J", "CR"),
+#                        "ji": ("J", "CRW"),
+#                        "k": ("K", "GW"),
+#                        "ki": ("KJ", "GW"),
+#                        "l": ("L", "L"),
+#                        "li": ("LJ", "LW"),
+#                        "ł": ("LJ", "LB"),
+#                        "łi": ("LJ", "LBW"),
+#                        "m": ("KP", "CS"),
+#                        "mi": ("KPJ", "CSW"),
+#                        "n": ("TV", "CL"),
+#                        "ni": ("TVJ", "CLW"),
+#                        "ń": ("TVJ", "CLW"),
+#                        # Tu zmieniłem prawą, bo nie ma "P" po prawej stronie
+#                        "p": ("P", "RG"),
+#                        "pi": ("PJ", "RGW"),
+#                        "q": ("KV", "GWY"),
+#                        "r": ("R", "R"),
+#                        "ri": ("RJ", "RW"),
+#                        "rz": ("RJ", "RBW"),
+#                        "s": ("S", "S"),
+#                        "si": ("SJ", "SW"),
+#                        "sz": ("TP", "RB"),
+#                        "ś": ("SJ", "SW"),
+#                        "t": ("T", "T"),
+#                        "ti": ("TJ", "TW"),
+#                        "v": ("V", "W"),
+#                        "vi": ("VJ", "W"),
+#                        "w": ("V", "W"),
+#                        "wi": ("VJ", "~W"),
+#                        "x": ("SK", "BSG"),
+#                        "xi": ("SKJ", "BSGW"),
+#                        "z": ("Z", "BS"),
+#                        "zi": ("ZJ", "BSW"),
+#                        "ź": ("ZJ", "BSW"),
+#                        "ż": ("TP~", "RBW")}
 
 fonemy_spółgłoskowe_klucze = ["b", "bi", "c", "ci", "ch", "chi", "cz", "czi", "ć",
                               "d", "di", "dz", "dzi", "dź", "dż", "f", "fi", "g",
@@ -97,9 +97,7 @@ fonemy_samogłoskowe = {"a": ("A", "TO"),
 fonemy_samogłoskowe_klucze = ["a", "ą", "e", "ę", "i",
                               "o", "ó", "u", "y",]
 
-
-def fonemy(string, zmiękczenie = False):
-    fonemy_dwuznakowe = {"b": ["i"],
+fonemy_dwuznakowe = {"b": ["i"],
                          "c": ["h", "i", "z"],
                          "d": ["i", "z", "ź", "ż"],
                          "f": ["i"],
@@ -117,6 +115,9 @@ def fonemy(string, zmiękczenie = False):
                          "t": ["i"],
                          "w": ["i"],
                          "z": ["i"]}
+
+
+def fonemy(string, zmiękczenie = False):    
     znaki = split(string)
     if zmiękczenie:
         znaki.append("i")
@@ -169,6 +170,30 @@ def wygeneruj_odjemniki(malejące_lewe, malejące_prawe):
     return odjemniki
 
 
+def podziel_sylaby_na_strony(sylaby, gdzie_podzielić=-2):
+    ilość_sylab = len(sylaby)
+    if gdzie_podzielić < 0:
+        gdzie_podzielić = ilość_sylab + gdzie_podzielić
+        if gdzie_podzielić < 0:
+            gdzie_podzielić = 0
+    if gdzie_podzielić > ilość_sylab -1:
+        gdzie_podzielić = ilość_sylab -1
+    sylaby_lewe = []
+    sylaby_prawe = []
+    if ilość_sylab == 1:
+        return (sylaby_lewe, sylaby[0], sylaby_prawe)
+    else:
+        for i in range(gdzie_podzielić):
+            sylaby_lewe.append(sylaby[i])
+        if gdzie_podzielić == ilość_sylab - 1:
+            sylaby_prawe = []
+        else:
+            sylaby_prawe = [sylaby[gdzie_podzielić + 1]]
+        return (sylaby_lewe,
+                sylaby[gdzie_podzielić],
+                sylaby_prawe)
+
+
 def dzielniki_dla_słowa_o_długości(n):
     if n == 0:
         return []
@@ -195,16 +220,6 @@ def dzielniki_dla_słowa_o_długości(n):
             z_początku = not z_początku
         return lista
 
-# # TODO naprawić to
-# def odejmij_fonemy_wg_wagi(fonemy, do_odjęcia, i):
-#     # print(f"odejmuję od {fonemy} któryś z tych: {do_odjęcia}")
-#     nowe_fonemy = fonemy
-#     który_odjąć = do_odjęcia[0]
-#     for fonem in do_odjęcia[1:]:
-#         if fonem[1] < który_odjąć[1]:
-#             który_odjąć = fonem
-#     nowe_fonemy.remove(który_odjąć)
-#     return nowe_fonemy
 
 # indeksy kolumn po lewej stronie od 0
 lewe_indeksy_klawiszy = {"X": 0, "F": 0, "XF": 0, "XZ": 0, "FS": 0, "XFZS": 0,
@@ -212,12 +227,12 @@ lewe_indeksy_klawiszy = {"X": 0, "F": 0, "XF": 0, "XZ": 0, "FS": 0, "XFZS": 0,
                          "K": 2, "T": 2, "KT": 2,
                          "P": 3, "V": 3, "PV": 3,
                          "L": 4, "R": 4, "LR": 4,
-                         "~": 5, "*": 5,
-                         "J": 6}
+                         tylda: 5, gwiazdka: 5,
+                         jot: 6}
 
 
 # indeksy kolumn po prawej stronie od 0
-prawe_indeksy_klawiszy = {"~": 5, "*": 5,
+prawe_indeksy_klawiszy = {tylda: 5, gwiazdka: 5,
                           "C": 6, "R": 6, "CR": 6,
                           "L": 7, "B": 7, "LB": 7,
                           "S": 8, "G": 8, "SG": 8,
@@ -225,21 +240,21 @@ prawe_indeksy_klawiszy = {"~": 5, "*": 5,
                           "O": 10, "Y": 10, "OY": 10}
 
 
-znaki_środka = ["J", "E",tylda, gwiazdka, "I", "A", "U"]
+znaki_środka = [jot, ee, tylda, gwiazdka, ii, aa, uu]
 
-def klawisze_dla_fonemu(fonem, prawe=False):
+def klawisze_dla_fonemu(fonem, konfiguracja, prawe=False):
     fonem = fonem[0]
     if prawe:
         if fonem in samogłoski:
             return fonemy_samogłoskowe[fonem][1]
-        return fonemy_spółgłoskowe[fonem][1]           
+        return konfiguracja.fonemy_spółgłoskowe[fonem][1]           
     else:
         if fonem in samogłoski:
             return nic
-        return fonemy_spółgłoskowe[fonem][0]
+        return konfiguracja.fonemy_spółgłoskowe[fonem][0]
 
 
-def niemalejące(fonemy_lewe, fonemy_prawe, bez_inwersji=False):
+def niemalejące(fonemy_lewe, fonemy_prawe, konfiguracja, bez_inwersji=False):
     # print(f"Niemalejące?: {fonemy_lewe}|{fonemy_prawe}")
     inwersja_użyta = False
     if bez_inwersji:
@@ -251,7 +266,7 @@ def niemalejące(fonemy_lewe, fonemy_prawe, bez_inwersji=False):
         fonem = fonemy_lewe[i]
         minimalny_indeks_klawisza = 5
         # print(f"Fonem:{fonem} w {fonemy_lewe}")
-        for klawisz in klawisze_dla_fonemu(fonem[0]):
+        for klawisz in klawisze_dla_fonemu(fonem[0], konfiguracja):
             bieżący_indeks = indeksy[klawisz]
             if bieżący_indeks < minimalny_indeks_klawisza:
                 minimalny_indeks_klawisza = bieżący_indeks
@@ -280,7 +295,7 @@ def niemalejące(fonemy_lewe, fonemy_prawe, bez_inwersji=False):
     for i in range(len(fonemy_prawe)):
         fonem = fonemy_prawe[i]  # ('di', waga)
         minimalny_indeks_klawisza = 10
-        for klawisz in klawisze_dla_fonemu(fonem[0], prawe=True):
+        for klawisz in klawisze_dla_fonemu(fonem[0], konfiguracja, prawe=True):
             bieżący_indeks = indeksy[klawisz]
             if bieżący_indeks < minimalny_indeks_klawisza:
                 minimalny_indeks_klawisza = bieżący_indeks
@@ -341,6 +356,7 @@ class Logger:
             print(f"ERR: {dane}")
 
 
+#  Alternatywa dla collections.defaultdict
 class SłownikDomyślny(collections.UserDict):
     def __init__(self, domyślna_fabryka=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -357,8 +373,9 @@ class SłownikDomyślny(collections.UserDict):
 
 
 class Generator():
-    def __init__(self, log, słownik_ostateczny, sylaby_słowa):
+    def __init__(self, log, konfiguracja, słownik_ostateczny, sylaby_słowa):
         self.log = log
+        self.konfiguracja = konfiguracja
         # {tekst: {"Kombinacja": niedopasowanie}}
         self.słownik = słownik_ostateczny
         self._samogłoski = re.compile(r'[aąeęioóuy]+')
@@ -448,15 +465,15 @@ class Generator():
             return (len(fonemy_samogłoskowe[x][0]),
                     len(fonemy_samogłoskowe[x][1]))
         elif x in fonemy_spółgłoskowe_klucze:
-            return (len(fonemy_spółgłoskowe[x][0]),
-                    len(fonemy_spółgłoskowe[x][1]))
+            return (len(self.konfiguracja.fonemy_spółgłoskowe[x][0]),
+                    len(self.konfiguracja.fonemy_spółgłoskowe[x][1]))
 
     def waga_fonemu(self, fonem, prawe=False):
         waga = 0
         if fonem in fonemy_spółgłoskowe_klucze:
-            waga = fonemy_spółgłoskowe[fonem][0]
+            waga = self.konfiguracja.fonemy_spółgłoskowe[fonem][0]
             if prawe:
-                waga = fonemy_spółgłoskowe[fonem][1]
+                waga = self.konfiguracja.fonemy_spółgłoskowe[fonem][1]
         elif fonem in fonemy_samogłoskowe_klucze:
             waga = fonemy_samogłoskowe[fonem][0]
             if prawe:
@@ -541,6 +558,8 @@ class Generator():
             bez_środka = False
 
             while limit_prób > 0 and pozostały_kombinacje_do_przetestowania:
+                if słowo == "nać":
+                        self.log.info(f"limit: {limit_prób}")
                 # Wszystkie literki powinny być dopasowane
                 # nagłos - lewa, śródgłos - kciuk(i), wygłos - prawa
                 # self.log.debug(f"Sylaby: {sylaby_lewe}|{sylaba_środkowa}|{sylaby_prawe}")
@@ -550,12 +569,16 @@ class Generator():
                  fonemy_prawe) = self.rozbij_sylaby_na_fonemy(sylaby_lewe,
                                                             sylaba_środkowa,
                                                             sylaby_prawe)
-                # self.log.info(f"{fonemy_lewe} | {śródgłos} | {fonemy_prawe}")
+                if słowo == "nać":
+                    self.log.info(f"{fonemy_lewe} | {śródgłos} | {fonemy_prawe}")
+                    śródgłos = []
                 waga_słowa = 0
                 for fonem in fonemy_lewe + śródgłos + fonemy_prawe:
                     waga_słowa += fonem[1]
                 if bez_środka:
-                    śródgłos = nic
+                    if słowo == "nać":
+                        self.log.info(f"nać bez środka śródgłos: {śródgłos}")
+                    śródgłos = []
                 ręka_lewa = RękaLewa(self.log)
                 ręka_prawa = RękaPrawa(self.log)
 
@@ -568,6 +591,7 @@ class Generator():
                         fonemy_prawe = odejmij_fonemy(fonemy_prawe, malejące_prawe)
                         (fonemy_niemalejące, który, gdzie) = niemalejące(fonemy_lewe,
                                                                          fonemy_prawe,
+                                                                         self.konfiguracja,
                                                                          bez_inwersji)
                         #  Zbieramy informacje o fonemach, które być może
                         #  trzeba będzie wyciszyć aby uzyskać unikalną
@@ -581,10 +605,11 @@ class Generator():
                 if not wygenerowano_odjemniki:
                     odjemniki_sylab = wygeneruj_odjemniki(malejące_lewe, malejące_prawe)
                     wygenerowano_odjemniki = True
-                if odejmuj:
+                if odejmuj and indeks_odjemników < len(odjemniki_sylab) and indeks_odjemników >= 0:
+                    self.log.info(f"odjemniki: {odjemniki_sylab}")
                     (do_odjęcia_lewe,
                     do_odjęcia_prawe,
-                    wzrost_niedopasowania) = odjemniki_sylab[indeks_odejmików]
+                    wzrost_niedopasowania) = odjemniki_sylab[indeks_odjemników]
                     fonemy_lewe = odejmij_fonemy(fonemy_lewe,
                                                  malejące_lewe[indeks_odjemników])
                     fonemy_prawe = odejmij_fonemy(fonemy_prawe,
@@ -597,7 +622,7 @@ class Generator():
                     fonem = fonemy_lewe[i]
                     if i == długość_lewych -1:
                         ostatnia = True
-                    znaki = klawisze_dla_fonemu(fonem)
+                    znaki = klawisze_dla_fonemu(fonem, self.konfiguracja)
                     ręka_lewa.zbuduj_kombinację(znaki, pierwsza, ostatnia)
                     pierwsza = False
                 for fonem in śródgłos:
@@ -610,7 +635,7 @@ class Generator():
                     fonem = fonemy_prawe[i]
                     if i + 1 == długość_fonemów_prawych:
                         ostatnia = True
-                    znaki = klawisze_dla_fonemu(fonem, prawe=True)
+                    znaki = klawisze_dla_fonemu(fonem, self.konfiguracja, prawe=True)
                     ręka_prawa.zbuduj_kombinację(znaki, pierwsza, ostatnia)
                     pierwsza = False
                 # self.log.debug(f"{słowo} {waga_słowa}, Lewa:{ręka_lewa.waga()} Prawa: {ręka_prawa.waga()}")
@@ -629,30 +654,30 @@ class Generator():
                                                          ręka_prawa.akord_prawy())
                 kombinacje.append((kompletny_akord, niedopasowanie))
                 limit_prób -= 1
-                if bez_inwersji:
-                    bez_środka = True
-                if bez_środka:
-                    bez_inwersji = False
-                    bez_środka = False
-                    odejmuj = True
                 if odejmuj:
                     indeks_odjemników += 1
                     if indeks_odjemników >= len(odjemniki_sylab):
                         odejmuj = False
                         pozostały_kombinacje_do_przetestowania = False
+                if bez_środka:
+                    if słowo == "nać":
+                        self.log.info("nać bez środka")
+                    # bez_inwersji = False
+                    bez_środka = False
+                    odejmuj = True
+                if bez_inwersji:
+                    bez_środka = True
+                    bez_inwersji = False
 
         dodane = []
-        #  Kombinacja: ("ZNAKI", (dodanie_tyldy_możliwe),
-        #               (dodanie_gwiazdki_możliwe), (dodanie_tyl-gwi_możliwe))
-        #
-        # (dodanie_X_możliwe) == ((z_lewej, czy wszystkie znaki), (z_prawej, czy_wszystkie_znaki))
-
         if kombinacje:
             dodane = self._dopasuj_kombinacje(słowo, kombinacje)
         else:
             self.log.debug(f"Nie znalazłem kombinacji dla: {słowo}")
         nowe_kombinacje = []
         if len(dodane) == 0 and kombinacje:
+            if słowo == "nać":
+                self.log.info(f"naci niet {kombinacje}")
             #  Możemy pokombinować z gwiazdkami
             #  Na razie logika minimalistyczna
             for kombinacja in kombinacje:
@@ -661,6 +686,8 @@ class Generator():
                 # if len(dodane) > 0:
                 #     break
             if nowe_kombinacje:
+                if słowo == "nać":
+                    self.log.info(f"nowe dla nać: {nowe_podkombinacje}")
                 dodane += self._dopasuj_kombinacje(słowo, nowe_kombinacje)
 
         if self.postęp % self.loguj_postęp_co == 0:
@@ -696,6 +723,9 @@ class Generator():
         for znak in znaki_środka:
             if znak in kombinacja_środkowa:
                 wynik += znak
+        if wynik == nic:
+            wynik = myślnik
+
         return (ręka_lewa_znaki + wynik + ręka_prawa_znaki,
                 (ręka_lewa[1], ręka_prawa[1]),  # dodanie tyldy możliwe
                 (ręka_lewa[2], ręka_prawa[2]),  # dodanie gwiazdki możliwe
@@ -723,6 +753,8 @@ def main():
                         help='słowa do utworzenia słownika podzielone na sy=la=by')
     parser.add_argument('--baza', default='wyniki/baza.json',
                         help='początkowy plik słownika w formacie JSON')
+    parser.add_argument('--konfiguracja', default='konfiguracja.py',
+                        help='plik konfiguracji generatora')
     parser.add_argument('--slownik', default='wyniki/spektralny-slowik.json',
                         help='wynikowy plik JSON do załadowania do Plovera')
     args = parser.parse_args()
@@ -740,10 +772,12 @@ def main():
     # Słownik wyjściowy, dane w formie:
     # {tekst: {"Kombinacja": niedopasowanie}}
     słownik = collections.defaultdict(dict)
+    czytacz = Czytacz()
+    konfiguracja = czytacz.wczytaj_konfigurację(args.konfiguracja)
     numer_linii = 0
     if args.baza:
         log.info(f"Czytam bazę słownika z {args.baza}")
-        for linia in czytaj_linie_pliku(args.baza):
+        for linia in czytacz.czytaj_linie_pliku(args.baza):
             numer_linii += 1
             linia = linia.strip()
             if not linia or linia.startswith('#') or linia.startswith('{') or linia.startswith('}') :
@@ -755,7 +789,7 @@ def main():
 
     sylaby_słowa = dict()
     numer_linii = 0
-    for linia in czytaj_linie_pliku(args.slowa):
+    for linia in czytacz.czytaj_linie_pliku(args.slowa):
         numer_linii += 1
         linia = linia.strip()
         if linia.startswith('#'):
@@ -769,11 +803,11 @@ def main():
 
     log.info("Wczytałem sylaby, generuję klawisze...")
     istniejące_słowa = słownik.keys()
-    generator = Generator(log, słownik, sylaby_słowa)
+    generator = Generator(log, konfiguracja, słownik, sylaby_słowa)
     numer_generacji = 0
     czas_start = time.time()
     niepowodzenia = []
-    for linia in czytaj_linie_pliku(args.frekwencja):
+    for linia in czytacz.czytaj_linie_pliku(args.frekwencja):
         linia = linia.strip()
         słowo = linia.split('"')[1]
         frekwencja = int(linia.split(',')[1])
@@ -806,7 +840,7 @@ def main():
 
     # Posortuj słowa według kolejności klawiszy
     log.info("Zapis niesortowanego słownika zakończony, sortuję...")
-    kolejność = '/#XFZSKTPVLR-JE~*IAUCRLBSGTWOY'
+    kolejność = '/XFZSKTPVLRJE-~*IAUCRLBSGTWOY'
     posortowany_słownik = collections.OrderedDict(
         sorted(generator.kombinacje.items(), key=lambda wpis:
                [kolejność.index(k) for k in wpis[0]]))
@@ -858,9 +892,9 @@ def split(word):
     return [char for char in word]
 
 
-def czytaj_linie_pliku(plik):
-    for linia in open(plik, "r"):
-        yield linia
+# def czytaj_linie_pliku(plik):
+#     for linia in open(plik, "r"):
+#         yield linia
             
 
 class Klawisz:
@@ -971,12 +1005,12 @@ def dodaj_znaki_specjalne_do_kombinacji(kombinacja):
     if gwiazdka_już_jest:
         istniejąca_gwiazdka = gwiazdka
 
-    if not tylda_już_jest:
+    if not tylda_już_jest and (l_tylda or p_tylda):
         nowe_kombinacje.append(gołe_lewe + tylda + istniejąca_gwiazdka + gołe_prawe)
-    if not gwiazdka_już_jest:
+    if not gwiazdka_już_jest and (l_gwiazdka or p_gwiazdka):
         nowe_kombinacje.append(gołe_lewe + istniejąca_tylda + gwiazdka + gołe_prawe)
-    if not (tylda_już_jest and gwiazdka_już_jest):
-        nowe_kombinacje.append(gołe_lewe + lewe_wszystkie + gołe_prawe)
+    if not (tylda_już_jest and gwiazdka_już_jest) and (l_tyldogwiazdka or p_tyldogwiazdka):
+        nowe_kombinacje.append(gołe_lewe + tylda + gwiazdka + gołe_prawe)
     output = []
     for nowa in nowe_kombinacje:
         output.append( ((nowa, ((l_tylda, lt_wszystko),(p_tylda, pt_wszystko)),
@@ -1222,31 +1256,69 @@ class Palec:
             return (True, False)
         return (False, False)
 
-#  Jeśli sam(a) podajesz wartość gdzie_podzielić,
-#  musisz zadbać o poprawność.
-def podziel_sylaby_na_strony(sylaby, gdzie_podzielić=-2):
-    # TODO sparametryzować definicję podziału
-    ilość_sylab = len(sylaby)
-    if gdzie_podzielić < 0:
-        gdzie_podzielić = ilość_sylab + gdzie_podzielić
-        if gdzie_podzielić < 0:
-            gdzie_podzielić = 0
-    if gdzie_podzielić > ilość_sylab -1:
-        gdzie_podzielić = ilość_sylab -1
-    sylaby_lewe = []
-    sylaby_prawe = []
-    if ilość_sylab == 1:
-        return (sylaby_lewe, sylaby[0], sylaby_prawe)
-    else:
-        for i in range(gdzie_podzielić):
-            sylaby_lewe.append(sylaby[i])
-        if gdzie_podzielić == ilość_sylab - 1:
-            sylaby_prawe = []
-        else:
-            sylaby_prawe = [sylaby[gdzie_podzielić + 1]]
-        return (sylaby_lewe,
-                sylaby[gdzie_podzielić],
-                sylaby_prawe)
+
+#  TODO: usystematyzować to wszystko
+#  class Czytacz
+#  class Pisarz
+#  class Generator
+#  class KonfiguracjaGeneratora
+#  class Żądanie
+#  class Odpowiedź
+#  class Język
+#  class KonfiguracjaJęzyka
+#  class Słowo
+#  class Słownik
+#  class Sylaba
+#  class Fonem
+#  class Klawiatura
+#  class KonfiguracjaKlawiatury
+#  class Klawisz
+#  class Kombinacja
+#  class RękaLewa
+#  class RękaPrawa
+
+#  Czytacz wczytuje KonfiguracjęGeneratora.
+#  Czytacz wczytuje KonfiguracjęKlawiatury.
+#  Czytacz wczytuje KonfiguracjęJęzyka.
+#  Czytacz wczytuje Słowa do wygenerowania Kombinacji.
+#  Czytacz wczytuje bazowe Kombinacje do Słownika.
+#  Język jest tworzony na podstawie KonfiguracjiJęzyka.
+#  Język tworzy Słowo zawierające Sylaby.
+#  Sylaby zawierają Fonemy.
+#  Generator jest tworzony na podstawie KonfiguracjiGeneratora.
+#  Generator otrzymuje Słowo.
+#  Klawiatura jest tworzona na podstawie KonfiguracjiKlawiatury.
+#  Klawiatura zawiera RekęLewą i RękęPrawą i Środek.
+#  RekaLewa i RękaPrawa i Środek zawierają Klawisze.
+#  Generator wysyła do Klawiatury Żądanie.
+#  Żądanie zawiera Słowo i niezbędne ParametryKombinacji.
+#  W pętli do wyczerpania ParametrówKombinacji:
+#      Klawiatura aktualizuje RękęLewą, RękęPrawą i Środek.
+#      RękaLewa, RękaPrawa i Środek aktualizują swoje Klawisze.
+#      Klawiatura tworzy Kombinację na podstawie stanu RękiLewej, RękiPrawej i Środka.
+#      Klawiatura dodaje Kombinację do Odpowiedzi.
+#  Klawiatura zwraca do Generatora Odpowiedź.
+#  Generator porównuje Kombinacje zawarte w Odpowiedzi ze Słownikiem
+#  W razie niepowodzenia dodania Kombinacji do Słownika,
+#   Generator może wysłać ponowne Żądanie dla danego Słowa.
+#  Pisarz zapisuje wygenerowany Słownik do pliku wyjściowego.
+
+import os, importlib.util
+
+
+class Czytacz:
+    def __init__(self):
+        pass
+
+    def wczytaj_konfigurację(self, ścieżka_do_pliku):
+        spec = importlib.util.spec_from_file_location("Konfiguracja", ścieżka_do_pliku)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def czytaj_linie_pliku(self, plik):
+        for linia in open(plik, "r"):
+            yield linia
 
 
 if __name__ == '__main__':
